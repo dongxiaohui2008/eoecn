@@ -157,9 +157,9 @@ public class CustomHttpClient {
 									+ "AppleWebKit/553.1(KHTML,like Gecko) Version/4.0 Mobile Safari/533.1");
 			// 超时设置
 			/* 从连接池中取连接的超时时间 */
-			ConnManagerParams.setTimeout(params, 1000);
+			ConnManagerParams.setTimeout(params, 3000);
 			/* 连接超时 */
-			int ConnectionTimeOut = 3000;
+			int ConnectionTimeOut = 5000;
 			if (!HttpUtils.isWifiDataEnable(context)) {
 				ConnectionTimeOut = 10000;
 			}

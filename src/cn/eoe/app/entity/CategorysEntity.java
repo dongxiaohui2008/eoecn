@@ -1,7 +1,7 @@
 package cn.eoe.app.entity;
+
 /**
- * 返回的 大的json的 中的categorys的封装
- * @author wangxin
+ * 分类 tab
  *
  */
 public class CategorysEntity {
@@ -9,18 +9,33 @@ public class CategorysEntity {
 	private String name;
 	private String url;
 	
-		public String getName() {
+	/**
+	 * 分类名称
+	 * 
+	 */
+	public String getName() {
 		return name;
 	}
+	/**
+	 * 分类名称
+	 * 
+	 */
 	public void setName(String name) {
 		this.name = name;
 	}
+	
+	/**
+	 * 分类Url
+	 * 
+	 */
 	public String getUrl() {
 		return url;
 	}
+	/**
+	 * 分类Url
+	 * 
+	 */
 	public void setUrl(String url) {
 		this.url = url;
 	}
-	
-
 }

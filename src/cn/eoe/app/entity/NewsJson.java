@@ -11,6 +11,5 @@ public class NewsJson {
 	public void setResponse(NewsResponseEntity response) {
 		this.response = response;
 	}
-	
-	
+		
 }

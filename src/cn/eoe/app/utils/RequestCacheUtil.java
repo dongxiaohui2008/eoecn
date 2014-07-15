@@ -8,6 +8,11 @@ import java.io.IOException;
 import java.lang.ref.SoftReference;
 import java.util.LinkedHashMap;
 import org.apache.http.util.EncodingUtils;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
+
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.database.Cursor;
@@ -32,6 +37,7 @@ public class RequestCacheUtil {
 	// [start] 公有方法
 	/**
 	 * 根据RequestUrl获取内容
+	 * 
 	 * @param context
 	 * @param RequestUrl
 	 * @param source_type
@@ -56,9 +62,9 @@ public class RequestCacheUtil {
 					content_type, dbHelper, UseCache);
 		}
 	}
+
 	// [end]
 
-	
 	// [start] 私有方法
 	/**
 	 * 获得程序在sd卡上的cahce目录
@@ -88,6 +94,7 @@ public class RequestCacheUtil {
 
 	/**
 	 * 获取缓存内容
+	 * 
 	 * @param context
 	 * @param requestUrl
 	 * @param requestPath
@@ -119,6 +126,7 @@ public class RequestCacheUtil {
 
 	/**
 	 * 缓存
+	 * 
 	 * @param requestUrl
 	 * @param result
 	 */
@@ -130,6 +138,7 @@ public class RequestCacheUtil {
 
 	/**
 	 * 获取web内容并保存。。。
+	 * 
 	 * @param context
 	 * @param requestPath
 	 * @param requestUrl
@@ -142,6 +151,27 @@ public class RequestCacheUtil {
 			String requestUrl, String source_type, String content_type,
 			DBHelper dbHelper) {
 		String result = "";
+		
+		// hardy扩展方法
+		if (requestUrl.contains("entgroup")) {	
+			
+			Document doc = null;
+			try {
+				doc = Jsoup.connect(requestUrl).timeout(5000).get();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+			
+			Elements eles = doc.getElementsByClass("listbox");
+			String cnt = eles.get(0).getElementsByTag("li").get(0).html();
+			
+			result = "{\"response\":{\"date\":1405412322,\"categorys\":[{\"name\":\"最新资讯\",\"url\":\"http://api.eoe.cn//client/news?k=lists&t=new\"}], "
+					+ " \"list\":[{\"name\":\"最新资讯\",\"more_url\":\"http://api.eoe.cn//client/news?k=lists&pageNum=2&t=new\",\"items\":[ "
+					+ " {\"id\":\"18633\",\"thumbnail_url\":\"http://a1.eoe.cn/thumb/www/home/201407/14/714d/53c33b2981de9.jpg\",\"title\":\"程序员的八种级别,你在哪一级？\",\"time\":\"1405303382\",\"short_content\":\"你有没有遇到过那个经典的面试问题，“你预见过自己5...\",\"detail_url\":\"http://api.eoe.cn/client/news?k=show&id=18633\"} "
+					+ " ]}]}}";
+			return result;
+		}
+				
 		try {
 			result = HttpUtils.getByHttpClient(context, requestUrl);
 			if (result.equals(null) && result.equals("")) {
@@ -160,6 +190,7 @@ public class RequestCacheUtil {
 
 	/**
 	 * 根据RequestPath保存内容到文件
+	 * 
 	 * @param requestPath
 	 * @param result
 	 */
@@ -170,6 +201,7 @@ public class RequestCacheUtil {
 
 	/**
 	 * 保存内容到文件
+	 * 
 	 * @param requestPath
 	 * @param result
 	 */
@@ -196,6 +228,7 @@ public class RequestCacheUtil {
 
 	/**
 	 * update首条记录、其余insert
+	 * 
 	 * @param cursor
 	 * @param requestUrl
 	 * @param source_type
@@ -228,6 +261,7 @@ public class RequestCacheUtil {
 
 	/**
 	 * 获取缓存数据
+	 * 
 	 * @param requestUrl
 	 * @return
 	 */
@@ -244,6 +278,7 @@ public class RequestCacheUtil {
 
 	/**
 	 * 获取内容
+	 * 
 	 * @param requestPath
 	 * @param requestUrl
 	 * @param dbHelper
@@ -287,6 +322,7 @@ public class RequestCacheUtil {
 
 	/**
 	 * 读取文件
+	 * 
 	 * @param requestPath
 	 * @return
 	 */

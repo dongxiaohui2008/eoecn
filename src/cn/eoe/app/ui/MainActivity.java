@@ -43,6 +43,7 @@ import cn.eoe.app.R;
 import cn.eoe.app.adapter.BasePageAdapter;
 import cn.eoe.app.biz.BaseDao;
 import cn.eoe.app.biz.BlogsDao;
+import cn.eoe.app.biz.MyCsdn;
 import cn.eoe.app.biz.NewsDao;
 import cn.eoe.app.biz.TopDao;
 import cn.eoe.app.biz.WikiDao;
@@ -80,8 +81,8 @@ public class MainActivity extends BaseSlidingFragmentActivity implements
 	// title标题
 	private ImageView imgQuery;
 	private ImageView imgMore;
-	private ImageView imgLeft;//ViewPager导航指示箭头
-	private ImageView imgRight;//ViewPager导航指示箭头
+	private ImageView imgLeft;// ViewPager导航指示箭头
+	private ImageView imgRight;// ViewPager导航指示箭头
 	private FrameLayout mFrameTv;
 	private ImageView mImgTv;
 
@@ -97,10 +98,11 @@ public class MainActivity extends BaseSlidingFragmentActivity implements
 	private BlogsDao blogsDao;
 	private NewsDao newsDao;
 	private WikiDao wikiDao;
+	private MyCsdn mycsdn;
 
 	private List<Object> categoryList;
 
-	private List<NavigationModel> navs;//侧栏导航
+	private List<NavigationModel> navs;// 侧栏导航
 
 	private ListView lvTitle;
 	private SimpleAdapter lvAdapter;
@@ -122,7 +124,7 @@ public class MainActivity extends BaseSlidingFragmentActivity implements
 
 	private InputMethodManager imm;
 
-	private boolean isShowPopupWindows = false;//下拉菜单
+	private boolean isShowPopupWindows = false;// 下拉菜单
 
 	// [end]
 
@@ -132,13 +134,13 @@ public class MainActivity extends BaseSlidingFragmentActivity implements
 		super.onCreate(savedInstanceState);
 
 		initSlidingMenu();
-		setContentView(R.layout.above_slidingmenu);//主页面
+		setContentView(R.layout.above_slidingmenu);// 主页面
 		initClass();
 		initControl();
 		initViewPager();
 		initListView();
 		initgoHome();
-		initNav();			
+		initNav();
 	}
 
 	@Override
@@ -159,7 +161,7 @@ public class MainActivity extends BaseSlidingFragmentActivity implements
 	 * 初始化侧滑菜单
 	 */
 	private void initSlidingMenu() {
-		//设置SlidingMenu使用的布局
+		// 设置SlidingMenu使用的布局
 		setBehindContentView(R.layout.behind_slidingmenu);
 		// customize the SlidingMenu
 		sm = getSlidingMenu();
@@ -178,26 +180,26 @@ public class MainActivity extends BaseSlidingFragmentActivity implements
 				Context.INPUT_METHOD_SERVICE);
 		loadLayout = (LinearLayout) findViewById(R.id.view_loading);
 		loadFaillayout = (LinearLayout) findViewById(R.id.view_load_fail);
-		
+
 		mAboveTitle = (TextView) findViewById(R.id.tv_above_title);
 		mAboveTitle.setText("社区精选");
-		
-		//头部搜索按钮
+
+		// 头部搜索按钮
 		imgQuery = (ImageView) findViewById(R.id.imageview_above_query);
 		imgQuery.setOnClickListener(this);
 		imgQuery.setVisibility(View.GONE);
-		
+
 		imgMore = (ImageView) findViewById(R.id.imageview_above_more);
 		imgMore.setOnClickListener(this);
 		imgLeft = (ImageView) findViewById(R.id.imageview_above_left);
 		imgRight = (ImageView) findViewById(R.id.imageview_above_right);
-		
+
 		// editSearch.setOnKeyListener(onkey);
 		mViewPager = (ViewPager) findViewById(R.id.above_pager);
 		mIndicator = (PageIndicator) findViewById(R.id.above_indicator);
-		
+
 		lvTitle = (ListView) findViewById(R.id.behind_list_show);
-		
+
 		llGoHome = (LinearLayout) findViewById(R.id.Linear_above_toHome);
 		imgLogin = (ImageButton) findViewById(R.id.login_login);
 
@@ -223,6 +225,7 @@ public class MainActivity extends BaseSlidingFragmentActivity implements
 		newsDao = new NewsDao(this);
 		wikiDao = new WikiDao(this);
 		topDao = new TopDao(this);
+		mycsdn = new MyCsdn(this);
 	}
 
 	/**
@@ -230,13 +233,13 @@ public class MainActivity extends BaseSlidingFragmentActivity implements
 	 */
 	private void initViewPager() {
 		mBasePageAdapter = new BasePageAdapter(MainActivity.this);
-		
-		mViewPager.setOffscreenPageLimit(0);		
+
+		mViewPager.setOffscreenPageLimit(0);
 		mViewPager.setAdapter(mBasePageAdapter);
-		
+
 		mIndicator.setViewPager(mViewPager);
 		mIndicator.setOnPageChangeListener(new MyPageChangeListener());
-		
+
 		new MyTask().execute(topDao);
 	}
 
@@ -244,14 +247,12 @@ public class MainActivity extends BaseSlidingFragmentActivity implements
 	 * 加载侧滑菜单
 	 */
 	private void initListView() {
-		//适配器
-		lvAdapter = new SimpleAdapter(
-				this,
-				getData(),
-				R.layout.behind_list_show, 
-				new String[] { LIST_TEXT,LIST_IMAGEVIEW },
-				new int[] { R.id.textview_behind_title,	R.id.imageview_behind_icon }) 
-		{
+		// 适配器
+		lvAdapter = new SimpleAdapter(this, getData(),
+				R.layout.behind_list_show, new String[] { LIST_TEXT,
+						LIST_IMAGEVIEW },
+				new int[] { R.id.textview_behind_title,
+						R.id.imageview_behind_icon }) {
 			@Override
 			public View getView(int position, View convertView, ViewGroup parent) {
 				View view = super.getView(position, convertView, parent);
@@ -264,17 +265,17 @@ public class MainActivity extends BaseSlidingFragmentActivity implements
 				return view;
 			}
 		};
-		
+
 		lvTitle.setAdapter(lvAdapter);
 		lvTitle.setOnItemClickListener(new OnItemClickListener() {
 			@Override
 			public void onItemClick(AdapterView<?> parent, View view,
 					int position, long id) {
-				
+
 				NavigationModel navModel = navs.get(position);
 				mAboveTitle.setText(navModel.getName());
 				current_page = navModel.getTags();
-				
+
 				if (lvTitle.getTag() != null) {
 					if (lvTitle.getTag() == view) {
 						MainActivity.this.showContent();
@@ -300,6 +301,9 @@ public class MainActivity extends BaseSlidingFragmentActivity implements
 				case 3:
 					new MyTask().execute(blogsDao);
 					break;
+				case 4:
+					new MyTask().execute(mycsdn);
+					break;
 				}
 			}
 		});
@@ -311,14 +315,17 @@ public class MainActivity extends BaseSlidingFragmentActivity implements
 	private void initNav() {
 		navs = new ArrayList<NavigationModel>();
 		NavigationModel nav1 = new NavigationModel(getResources().getString(
-				R.string.menuGood), "");//社区精选
+				R.string.menuGood), "");// 社区精选
 		NavigationModel nav2 = new NavigationModel(getResources().getString(
-				R.string.menuNews), Constants.TAGS.NEWS_TAG);//新闻资讯
+				R.string.menuNews), Constants.TAGS.NEWS_TAG);// 新闻资讯
 		NavigationModel nav3 = new NavigationModel(getResources().getString(
-				R.string.menuStudio), Constants.TAGS.WIKI_TAG);//学习教程
+				R.string.menuStudio), Constants.TAGS.WIKI_TAG);// 学习教程
 		NavigationModel nav4 = new NavigationModel(getResources().getString(
-				R.string.menuBlog), Constants.TAGS.BLOG_TAG);//社区博客
-		Collections.addAll(navs, nav1, nav2, nav3, nav4);
+				R.string.menuBlog), Constants.TAGS.BLOG_TAG);// 社区博客
+		NavigationModel nav5 = new NavigationModel("人物访谈",
+				Constants.TAGS.NEWS_TAG);// MyCSDN
+
+		Collections.addAll(navs, nav1, nav2, nav3, nav4, nav5);
 	}
 
 	/**
@@ -330,31 +337,37 @@ public class MainActivity extends BaseSlidingFragmentActivity implements
 
 	/**
 	 * 侧滑菜单数据集
+	 * 
 	 * @return
 	 */
 	private List<Map<String, Object>> getData() {
 		List<Map<String, Object>> list = new ArrayList<Map<String, Object>>();
-		
+
 		Map<String, Object> map = new HashMap<String, Object>();
-		map.put(LIST_TEXT, getResources().getString(R.string.menuGood));//社区精选
+		map.put(LIST_TEXT, getResources().getString(R.string.menuGood));// 社区精选
 		map.put(LIST_IMAGEVIEW, R.drawable.dis_menu_handpick);
 		list.add(map);
-		
+
 		map = new HashMap<String, Object>();
-		map.put(LIST_TEXT, getResources().getString(R.string.menuNews));//新闻资讯
+		map.put(LIST_TEXT, getResources().getString(R.string.menuNews));// 新闻资讯
 		map.put(LIST_IMAGEVIEW, R.drawable.dis_menu_news);
 		list.add(map);
-		
+
 		map = new HashMap<String, Object>();
-		map.put(LIST_TEXT, getResources().getString(R.string.menuStudio));//学习教程
+		map.put(LIST_TEXT, getResources().getString(R.string.menuStudio));// 学习教程
 		map.put(LIST_IMAGEVIEW, R.drawable.dis_menu_studio);
 		list.add(map);
-		
+
 		map = new HashMap<String, Object>();
-		map.put(LIST_TEXT, getResources().getString(R.string.menuBlog));//社区博客
+		map.put(LIST_TEXT, getResources().getString(R.string.menuBlog));// 社区博客
 		map.put(LIST_IMAGEVIEW, R.drawable.dis_menu_blog);
 		list.add(map);
-		
+
+		map = new HashMap<String, Object>();
+		map.put(LIST_TEXT, "人物访谈");// 111
+		map.put(LIST_IMAGEVIEW, R.drawable.dis_menu_news);
+		list.add(map);
+
 		return list;
 	}
 
@@ -364,10 +377,10 @@ public class MainActivity extends BaseSlidingFragmentActivity implements
 	@Override
 	public void onClick(View v) {
 		switch (v.getId()) {
-		case R.id.Linear_above_toHome://侧滑按钮
+		case R.id.Linear_above_toHome:// 侧滑按钮
 			showMenu();
 			break;
-		case R.id.login_login://侧滑菜单-登录按钮
+		case R.id.login_login:// 侧滑菜单-登录按钮
 			SharedPreferences share = this.getSharedPreferences(
 					UserLoginUidActivity.SharedName, Context.MODE_PRIVATE);
 			// [start] 修复上一个bug
@@ -386,13 +399,13 @@ public class MainActivity extends BaseSlidingFragmentActivity implements
 				IntentUtil.start_activity(this, UserLoginActivity.class);
 			}
 			break;
-		case R.id.imageview_above_more://下拉菜单
+		case R.id.imageview_above_more:// 下拉菜单
 			if (isShowPopupWindows) {
 				new PopupWindowUtil(mViewPager).showActionWindow(v, this,
 						mBasePageAdapter.tabs);
 			}
 			break;
-		case R.id.imageview_above_query://顶部搜索按钮
+		case R.id.imageview_above_query:// 顶部搜索按钮
 			if (NetWorkHelper.isNetworkAvailable(MainActivity.this)) {
 				IntentUtil.start_activity(this, SearchActivity.class,
 						new BasicNameValuePair("tag", current_page));
@@ -401,11 +414,11 @@ public class MainActivity extends BaseSlidingFragmentActivity implements
 						Toast.LENGTH_LONG).show();
 			}
 			break;
-		case R.id.cbFeedback://侧滑菜单-反馈按钮
+		case R.id.cbFeedback:// 侧滑菜单-反馈按钮
 			// FeedbackAgent agent = new FeedbackAgent(this);
 			// agent.startFeedbackActivity();
 			break;
-		case R.id.cbAbove://侧滑菜单-关于按钮
+		case R.id.cbAbove:// 侧滑菜单-关于按钮
 			IntentUtil.start_activity(this, AboutActivity.class);
 			break;
 		case R.id.bn_refresh:
@@ -449,7 +462,7 @@ public class MainActivity extends BaseSlidingFragmentActivity implements
 				Toast.makeText(this,
 						getResources().getString(R.string.press_again_exit),
 						Toast.LENGTH_SHORT).show();
-				Timer timer = new Timer();//Android计时器
+				Timer timer = new Timer();// Android计时器
 				timer.schedule(new TimerTask() {
 					@Override
 					public void run() {
@@ -469,7 +482,7 @@ public class MainActivity extends BaseSlidingFragmentActivity implements
 				break;
 			}
 			return true;
-		} else if (keyCode == KeyEvent.KEYCODE_MENU) {//监听android菜单键
+		} else if (keyCode == KeyEvent.KEYCODE_MENU) {// 监听android菜单键
 			if (sm.isMenuShowing()) {
 				toggle();
 			} else {
@@ -481,18 +494,18 @@ public class MainActivity extends BaseSlidingFragmentActivity implements
 
 	private float lastX = 0;
 	private float lastY = 0;
-	
+
 	@Override
 	public boolean dispatchTouchEvent(MotionEvent event) {
 		super.dispatchTouchEvent(event);
-		
+
 		if (mIsAnim || mViewPager.getChildCount() <= 1) {
 			return false;
 		}
 
 		float x = event.getX();
 		float y = event.getY();
-		
+
 		final int action = event.getAction();
 		switch (action) {
 		case MotionEvent.ACTION_DOWN:
@@ -599,8 +612,17 @@ public class MainActivity extends BaseSlidingFragmentActivity implements
 					map.put("tabs", categorys);
 					map.put("list", categoryList);
 				}
-			} else {
-				return null;
+			} else if (dao instanceof MyCsdn) {
+				mUseCache=false;
+				mTag = 1;
+				if ((newsResponseData = mycsdn.mapperJson(mUseCache)) != null) {
+
+					categorys = newsResponseData.getCategorys();
+					categoryList = (List) newsResponseData.getList();
+
+					map.put("tabs", categorys);
+					map.put("list", categoryList);
+				}
 			}
 			return map;
 		}
@@ -610,15 +632,15 @@ public class MainActivity extends BaseSlidingFragmentActivity implements
 		@Override
 		protected void onPostExecute(Map<String, Object> result) {
 			super.onPostExecute(result);
-			
+
 			isShowPopupWindows = true;
 			mBasePageAdapter.Clear();
 			mViewPager.removeAllViews();
-			
+
 			if (!result.isEmpty()) {
 				mBasePageAdapter.addFragment((List) result.get("tabs"),
 						(List) result.get("list"));
-				
+
 				imgRight.setVisibility(View.VISIBLE);
 				loadLayout.setVisibility(View.GONE);
 				loadFaillayout.setVisibility(View.GONE);
@@ -650,19 +672,19 @@ public class MainActivity extends BaseSlidingFragmentActivity implements
 		@Override
 		public void onPageSelected(int arg0) {
 			if (arg0 == 0) {
-				imgLeft.setVisibility(View.GONE);//ViewPager导航指示箭头
-				
+				imgLeft.setVisibility(View.GONE);// ViewPager导航指示箭头
+
 				getSlidingMenu().setTouchModeAbove(
-						SlidingMenu.TOUCHMODE_FULLSCREEN);								
+						SlidingMenu.TOUCHMODE_FULLSCREEN);
 			} else if (arg0 == mBasePageAdapter.mFragments.size() - 1) {
 				imgRight.setVisibility(View.GONE);
-				
+
 				getSlidingMenu()
-						.setTouchModeAbove(SlidingMenu.TOUCHMODE_MARGIN);				
+						.setTouchModeAbove(SlidingMenu.TOUCHMODE_MARGIN);
 			} else {
 				imgRight.setVisibility(View.VISIBLE);
 				imgLeft.setVisibility(View.VISIBLE);
-				
+
 				getSlidingMenu()
 						.setTouchModeAbove(SlidingMenu.TOUCHMODE_MARGIN);
 			}
@@ -687,7 +709,7 @@ public class MainActivity extends BaseSlidingFragmentActivity implements
 	@Override
 	public void onAnimationEnd(Animation animation) {
 		if (mIsTitleHide) {
-			title.setVisibility(View.GONE);//隐藏头部
+			title.setVisibility(View.GONE);// 隐藏头部
 		} else {
 		}
 		mIsAnim = false;
@@ -700,7 +722,7 @@ public class MainActivity extends BaseSlidingFragmentActivity implements
 
 	@Override
 	public void onAnimationStart(Animation animation) {
-		title.setVisibility(View.VISIBLE);//显示头部
+		title.setVisibility(View.VISIBLE);// 显示头部
 		if (mIsTitleHide) {
 			FrameLayout.LayoutParams lp = (LayoutParams) mlinear_listview
 					.getLayoutParams();
@@ -711,7 +733,7 @@ public class MainActivity extends BaseSlidingFragmentActivity implements
 					.getLayoutParams();
 			lp.setMargins(0, 0, 0, 0);
 			title.setLayoutParams(lp);
-			
+
 			FrameLayout.LayoutParams lp1 = (LayoutParams) mlinear_listview
 					.getLayoutParams();
 			lp1.setMargins(0,

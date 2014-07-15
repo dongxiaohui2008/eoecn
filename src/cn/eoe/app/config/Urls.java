@@ -31,7 +31,7 @@ public class Urls {
 	/**
 	 * 新闻资讯
 	 */
-	public static final String NEWS_LIST = BASIC_URL + "/news?k=lists";
+	public static final String NEWS_LIST = BASIC_URL + "/news?k=lists";	
 	/**
 	 * 学习教程
 	 */
@@ -67,4 +67,10 @@ public class Urls {
 	 * 获取用户信息接口
 	 */
 	public static final String KEYBindURL = BASIC_URL + "/userinfo?key=%s";
+	
+	
+	/**
+	 * 专访
+	 */
+	public static final String Interview_LIST = "http://interview.entgroup.cn/index.shtml";
 }
