@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
-import com.umeng.fb.FeedbackAgent;
+//import com.umeng.fb.FeedbackAgent;
 import org.apache.http.message.BasicNameValuePair;
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -402,8 +402,8 @@ public class MainActivity extends BaseSlidingFragmentActivity implements
 			}
 			break;
 		case R.id.cbFeedback://侧滑菜单-反馈按钮
-			FeedbackAgent agent = new FeedbackAgent(this);
-			agent.startFeedbackActivity();
+			// FeedbackAgent agent = new FeedbackAgent(this);
+			// agent.startFeedbackActivity();
 			break;
 		case R.id.cbAbove://侧滑菜单-关于按钮
 			IntentUtil.start_activity(this, AboutActivity.class);

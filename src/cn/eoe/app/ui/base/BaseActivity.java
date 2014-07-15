@@ -15,7 +15,7 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.Toast;
 import cn.eoe.app.R;
 import cn.eoe.app.utils.LogUtil;
-import com.umeng.analytics.MobclickAgent;
+//import com.umeng.analytics.MobclickAgent;
 
 public class BaseActivity extends Activity {
 
@@ -30,7 +30,7 @@ public class BaseActivity extends Activity {
 				+ " onCreate() invoked!!");
 		super.onCreate(savedInstanceState);
 		requestWindowFeature(Window.FEATURE_NO_TITLE);// 启用窗体的扩展特性:无标题
-		MobclickAgent.onError(this);// umeng监测
+		//MobclickAgent.onError(this);// umeng监测
 	}
 
 	@Override
@@ -51,7 +51,7 @@ public class BaseActivity extends Activity {
 		LogUtil.d(TAG, this.getClass().getSimpleName()
 				+ " onResume() invoked!!");
 		super.onResume();
-		MobclickAgent.onResume(this);// umeng监测
+		//MobclickAgent.onResume(this);// umeng监测
 	}
 
 	@Override
@@ -59,7 +59,7 @@ public class BaseActivity extends Activity {
 		LogUtil.d(TAG, this.getClass().getSimpleName() + " onPause() invoked!!");
 		super.onPause();
 		try {
-			MobclickAgent.onPause(this);// umeng监测
+			//MobclickAgent.onPause(this);// umeng监测
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
