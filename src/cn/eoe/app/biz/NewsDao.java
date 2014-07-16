@@ -67,6 +67,7 @@ public class NewsDao extends BaseDao {
 					more_url + Utility.getScreenParams(mActivity),
 					Constants.WebSourceType.Json,
 					Constants.DBContentType.Content_list, true);
+			
 			response = mObjectMapper.readValue(result,
 					new TypeReference<NewsMoreResponse>() {
 					});

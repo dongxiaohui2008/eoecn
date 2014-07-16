@@ -154,4 +154,15 @@ pre {
 
 table.highlighttable td.code .highlight pre {
 	background-color: white;
+} 
+.likes {    float: left;}
+.likes .img_p {
+    height: 26px;
+    width: 26px;
+}
+.likes .dates {
+    float: left;
+    overflow: hidden;
+    padding-left: 8px;
+    width: 80px;
 }

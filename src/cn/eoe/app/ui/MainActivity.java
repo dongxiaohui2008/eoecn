@@ -322,8 +322,8 @@ public class MainActivity extends BaseSlidingFragmentActivity implements
 				R.string.menuStudio), Constants.TAGS.WIKI_TAG);// 学习教程
 		NavigationModel nav4 = new NavigationModel(getResources().getString(
 				R.string.menuBlog), Constants.TAGS.BLOG_TAG);// 社区博客
-		NavigationModel nav5 = new NavigationModel("人物访谈",
-				Constants.TAGS.NEWS_TAG);// MyCSDN
+		NavigationModel nav5 = new NavigationModel(getResources().getString(R.string.menuInterview),
+				Constants.TAGS.NEWS_TAG);// 人物访谈
 
 		Collections.addAll(navs, nav1, nav2, nav3, nav4, nav5);
 	}
@@ -364,7 +364,7 @@ public class MainActivity extends BaseSlidingFragmentActivity implements
 		list.add(map);
 
 		map = new HashMap<String, Object>();
-		map.put(LIST_TEXT, "人物访谈");// 111
+		map.put(LIST_TEXT, getResources().getString(R.string.menuInterview));// 人物访谈
 		map.put(LIST_IMAGEVIEW, R.drawable.dis_menu_news);
 		list.add(map);
 

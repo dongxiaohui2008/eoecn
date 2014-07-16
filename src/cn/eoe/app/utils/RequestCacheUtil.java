@@ -151,40 +151,194 @@ public class RequestCacheUtil {
 			String requestUrl, String source_type, String content_type,
 			DBHelper dbHelper) {
 		String result = "";
-		
-		// hardy扩展方法
-		if (requestUrl.contains("entgroup")) {	
-			
+
+		java.util.regex.Pattern pattern = java.util.regex.Pattern
+				.compile("/[0-9]*.shtml");
+		java.util.regex.Matcher match = pattern.matcher(requestUrl
+				.substring(requestUrl.lastIndexOf("/")));
+
+		// hardy拓展方法
+		if (match.matches()) {
+			// 文章
 			Document doc = null;
 			try {
 				doc = Jsoup.connect(requestUrl).timeout(5000).get();
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
-			
-			Elements eles = doc.getElementsByClass("listbox");
-			String cnt = eles.get(0).getElementsByTag("li").get(0).html();
-			
-			result = "{\"response\":{\"date\":1405412322,\"categorys\":[{\"name\":\"最新资讯\",\"url\":\"http://api.eoe.cn//client/news?k=lists&t=new\"}], "
-					+ " \"list\":[{\"name\":\"最新资讯\",\"more_url\":\"http://api.eoe.cn//client/news?k=lists&pageNum=2&t=new\",\"items\":[ "
-					+ " {\"id\":\"18633\",\"thumbnail_url\":\"http://a1.eoe.cn/thumb/www/home/201407/14/714d/53c33b2981de9.jpg\",\"title\":\"程序员的八种级别,你在哪一级？\",\"time\":\"1405303382\",\"short_content\":\"你有没有遇到过那个经典的面试问题，“你预见过自己5...\",\"detail_url\":\"http://api.eoe.cn/client/news?k=show&id=18633\"} "
-					+ " ]}]}}";
-			return result;
-		}
-				
-		try {
-			result = HttpUtils.getByHttpClient(context, requestUrl);
-			if (result.equals(null) && result.equals("")) {
-				return result;
+			Element ele = doc.getElementsByClass("content").get(0);
+
+			String title = ele.getElementsByTag("h1").get(0).html();
+			String desc = ele.getElementsByClass("art_info").get(0).html();
+			String cnt = ele.getElementsByClass("art_content").get(0).html();
+			String artInfo = ele.getElementsByClass("art_info").get(0).html();
+
+			result = "<style> /* CSS Document */  "
+					+ " img{} "
+					+ " .show{margin:0 auto;font:12px/24px '微软雅黑',Arial,Helvetica,sans-serif;; color:#757575;}"
+					+ "	.show h1{font-size:22px;line-height:36px;font-weight:normal;color:#363636;}"
+					+ "	 .show h4{font-size:14px;font-weight:normal;line-height:20px;color:#bdbdbd;}"
+					+ "	 </style>" + "	<div class=\"show\"><h1>" + title
+					+ "</h1>" + "	<h4><span style=\"padding-right:8px;\">"
+					+ artInfo + "</span>"
+					+ "	<div class=\"content\"><div class='markdown'><p>" + cnt
+					+ "</p></div></div></div>";
+
+			Elements imgs = ele.getElementsByTag("img");
+			for (int i = 0; i < imgs.size(); i++) {
+				Element img = imgs.get(i);
+
+				String flg = img.className();
+				if (!flg.equals("img_p")) {
+					String wid = img.attributes().get("width");
+					String sty = img.attributes().get("style");
+
+					result = result.replace("width=\"" + wid + "\"", "");
+					result = result.replace("style=\"" + sty + "\"", "");
+				}
 			}
-			// 更新数据库
-			Cursor cursor = getStringFromDB(requestUrl, dbHelper);
-			updateDB(cursor, requestUrl, source_type, content_type, dbHelper);
-			saveFileByRequestPath(requestPath, result);
-			putStringForSoftReference(requestUrl, result);
-		} catch (Exception e) {
-			e.printStackTrace();
+		} else if (requestUrl.contains("entgroup")) {
+
+			// http://interview.entgroup.cn/index1.shtml&screen=720*1280
+			if (requestUrl.contains("&")) {
+				requestUrl = requestUrl.substring(0,
+						requestUrl.lastIndexOf("&"));
+			}
+
+			// 列表页
+			Document doc = null;
+			try {
+				doc = Jsoup.connect(requestUrl).timeout(5000).get();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+
+			String moreUrl = "";
+			Elements pages = doc.getElementsByClass("pagelist").get(0)
+					.getElementsByTag("li");
+			String maxpage = pages.get(pages.size() - 1).getElementsByTag("a")
+					.get(0).attributes().get("href");
+			// http://interview.entgroup.cn/index.shtml
+			String currpage = requestUrl
+					.substring(requestUrl.lastIndexOf("/") + 1);
+
+			int max = Integer.parseInt(maxpage.replace("index", "").replace(
+					".shtml", ""));
+			int curr = Integer.parseInt(currpage.replace("index", "")
+					.replace(".shtml", "").isEmpty() ? "0" : currpage.replace(
+					"index", "").replace(".shtml", ""));
+			if (curr < max) {
+				curr = curr + 1;
+				if (curr == max) {
+					moreUrl = "";
+				} else {
+					moreUrl = requestUrl.substring(0,
+							requestUrl.lastIndexOf("/") + 1)
+							+ "index" + curr + ".shtml";
+				}
+			}
+
+			if (curr == 1) {
+				result = extracted(requestUrl, doc, moreUrl);
+			} else {
+				result = extracted2(requestUrl, doc, moreUrl);
+			}
+		} else if (!requestUrl.contains("entgroup")) {
+			try {
+				result = HttpUtils.getByHttpClient(context, requestUrl);
+				if (result.equals(null) && result.equals("")) {
+					return result;
+				}
+				// 更新数据库
+				Cursor cursor = getStringFromDB(requestUrl, dbHelper);
+				updateDB(cursor, requestUrl, source_type, content_type,
+						dbHelper);
+				saveFileByRequestPath(requestPath, result);
+				putStringForSoftReference(requestUrl, result);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
 		}
+		return result;
+	}
+
+	/**
+	 * 列表首次加载
+	 */
+	private static String extracted(String requestUrl, Document doc,
+			String moreUrl) {
+		String result;
+		result = "{\"response\":{\"date\":1405412322,\"categorys\":[{\"name\":\"人物访谈\",\"url\":\"http://api.eoe.cn//client/news?k=lists&t=new\"}], "
+				+ " \"list\":[{\"name\":\"人物访谈\",\"more_url\":\""
+				+ moreUrl
+				+ "\",\"items\":[ ";
+
+		Elements eles = doc.getElementsByClass("listbox").get(0)
+				.getElementsByTag("li");
+		long nowTime = System.currentTimeMillis();
+
+		for (int i = 0; i < eles.size(); i++) {
+			Element ele = eles.get(i);
+
+			String title = ele.getElementsByTag("a").get(0).html();
+			String desc = ele.getElementsByTag("p").get(0).text();
+			String url = requestUrl.substring(0, requestUrl.lastIndexOf("/"))
+					+ ele.getElementsByTag("a").get(0).attributes().get("href");
+
+			if (i < eles.size() - 1) {
+				result += " {\"id\":\"18633\",\"thumbnail_url\":\"\",\"title\":\""
+						+ title
+						+ "\",\"time\":\"1405303382\",\"short_content\":\""
+						+ desc + "\",\"detail_url\":\"" + url + "\"}, ";
+			} else {
+				result += " {\"id\":\"18633\",\"thumbnail_url\":\"\",\"title\":\""
+						+ title
+						+ "\",\"time\":\"1405303382\",\"short_content\":\""
+						+ desc + "\",\"detail_url\":\"" + url + "\"} ";
+			}
+		}
+
+		result += " ]}]}}";
+		return result;
+	}
+
+	/**
+	 * 列表加载more
+	 */
+	private static String extracted2(String requestUrl, Document doc,
+			String moreUrl) {
+		String result;
+		result = "{\"response\":{\"name\":\"人物访谈\",\"more_url\":\"" + moreUrl
+				+ "\", " + " \"items\":[ ";
+
+		Elements eles = doc.getElementsByClass("listbox").get(0)
+				.getElementsByTag("li");
+		long nowTime = System.currentTimeMillis();
+
+		for (int i = 0; i < eles.size(); i++) {
+			Element ele = eles.get(i);
+
+			String title = ele.getElementsByTag("a").get(0).html().replace(",", "\\,");
+			String desc = ele.getElementsByTag("p").get(0).text().replace(",", "\\,");
+			String url = requestUrl.substring(0, requestUrl.lastIndexOf("/"))
+					+ ele.getElementsByTag("a").get(0).attributes().get("href").replace(",", "\\,");
+			
+			desc=desc.replace("(", "").replace(")", "").replace(",", "");
+
+			if (i < eles.size() - 1) {
+				result += " {\"id\":\"18633\",\"thumbnail_url\":\"\",\"title\":\""
+						+ title
+						+ "\",\"time\":\"1405303382\",\"short_content\":\""
+						+ desc + "\",\"detail_url\":\"" + url + "\"}, ";
+			} else {
+				result += " {\"id\":\"18633\",\"thumbnail_url\":\"\",\"title\":\""
+						+ title
+						+ "\",\"time\":\"1405303382\",\"short_content\":\""
+						+ desc + "\",\"detail_url\":\"" + url + "\"} ";
+			}
+		}
+
+		result += " ]}}";
 		return result;
 	}
 

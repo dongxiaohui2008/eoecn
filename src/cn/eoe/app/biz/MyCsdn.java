@@ -67,7 +67,7 @@ public class MyCsdn extends BaseDao {
 		NewsMoreResponse response;
 		try {
 			String result = RequestCacheUtil.getRequestContent(mActivity,
-					more_url + Utility.getScreenParams(mActivity),
+					more_url + Utility.getScreenParams(mActivity),					
 					Constants.WebSourceType.Json,
 					Constants.DBContentType.Content_list, true);
 			response = mObjectMapper.readValue(result,

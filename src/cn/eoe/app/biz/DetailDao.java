@@ -25,7 +25,14 @@ public class DetailDao extends BaseDao {
 	public DetailDao(Activity activity,String url)
 	{
 		super(activity);
-		mUrl=url+ Utility.getScreenParams(mActivity);
+		if(url.contains("entgroup"))
+		{
+			mUrl=url;	
+		}	
+		else
+		{
+			mUrl=url+ Utility.getScreenParams(mActivity);	
+		}
 	}
 	
 	private DetailResponseEntity mDetailResponseEntity;
@@ -43,9 +50,20 @@ public class DetailDao extends BaseDao {
 			String result = RequestCacheUtil.getRequestContent(mActivity,
 					mUrl, Constants.WebSourceType.Json,
 					Constants.DBContentType.Content_content, useCache);
+			
+			if(!mUrl.contains("entgroup"))
+			{
 			Log.i("info",mUrl);
 			DetailJson detailJson = mObjectMapper.readValue(result, new TypeReference<DetailJson>() {});
 			this.mDetailResponseEntity = detailJson.getResponse();
+			}
+			else
+			{
+				mDetailResponseEntity=new DetailResponseEntity();
+				this.mDetailResponseEntity.setContent(result);
+				this.mDetailResponseEntity.setShare_url(mUrl);
+			}
+			
 			return this.mDetailResponseEntity;
 		} catch (JsonParseException e) {			
 			e.printStackTrace();

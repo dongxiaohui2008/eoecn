@@ -95,7 +95,7 @@ public class DetailsActivity extends BaseActivity implements OnClickListener {
 	private void initData() {
 		DisplayMetrics dm = new DisplayMetrics();
 		getWindowManager().getDefaultDisplay().getMetrics(dm);
-		screen_width = dm.widthPixels;
+		screen_width = dm.widthPixels-40;
 	}
 
 	/**
@@ -254,6 +254,7 @@ public class DetailsActivity extends BaseActivity implements OnClickListener {
 		@Override
 		protected String doInBackground(String... params) {
 		    //获取文章
+			mUseCache=false;
 			if ((responseEntity = detailDao.mapperJson(mUseCache)) != null) {
 				shareUrl = responseEntity.getShare_url();
 				return responseEntity.getContent();
@@ -274,9 +275,10 @@ public class DetailsActivity extends BaseActivity implements OnClickListener {
 									+ CommonUtil.px2dip(DetailsActivity.this,
 											screen_width) + "}");
 					content = content.replaceAll("<br />", "");
+										
 				} catch (NullPointerException e) {
 					e.printStackTrace();
-				}
+				}							
 				loadLayout.setVisibility(View.GONE);
 				failLayout.setVisibility(View.GONE);
 				mWebView.setVisibility(View.VISIBLE);

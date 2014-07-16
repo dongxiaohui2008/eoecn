@@ -10,7 +10,10 @@ public class DetailResponseEntity {
 	private String share_url;//分享地址
 	private int comment_num;//评论数
 	private DetailBarEntity bar;//操作栏
-		
+	
+	public void DetailResponseEntity()
+	{}
+	
 	public String getContent() {
 		return content;
 	}
