@@ -20,8 +20,15 @@ import cn.eoe.app.utils.Utility;
  */
 public class MyCsdn extends BaseDao {
 
+	private String url;
+	
 	public MyCsdn(Activity activity) {
 		super(activity);
+	}
+	
+	public MyCsdn(Activity activity,String url) {
+		super(activity);
+		this.setUrl(url);
 	}
 
 	private NewsResponseEntity _newsResponse;
@@ -38,7 +45,7 @@ public class MyCsdn extends BaseDao {
 		NewsJson newsJson;
 		try {
 			String result = RequestCacheUtil.getRequestContent(mActivity,
-					Urls.Interview_LIST,
+					getUrl(),
 					Constants.WebSourceType.Json,
 					Constants.DBContentType.Content_list,
 					useCache);
@@ -82,6 +89,14 @@ public class MyCsdn extends BaseDao {
 			e.printStackTrace();
 		}
 		return null;
+	}
+
+	public String getUrl() {
+		return url;
+	}
+
+	public void setUrl(String url) {
+		this.url = url;
 	}
 	
 }

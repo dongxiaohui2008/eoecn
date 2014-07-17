@@ -48,6 +48,7 @@ import cn.eoe.app.biz.NewsDao;
 import cn.eoe.app.biz.TopDao;
 import cn.eoe.app.biz.WikiDao;
 import cn.eoe.app.config.Constants;
+import cn.eoe.app.config.Urls;
 import cn.eoe.app.db.DBHelper;
 import cn.eoe.app.entity.BlogsResponseEntity;
 import cn.eoe.app.entity.CategorysEntity;
@@ -301,9 +302,26 @@ public class MainActivity extends BaseSlidingFragmentActivity implements
 				case 3:
 					new MyTask().execute(blogsDao);
 					break;
-				case 4:
+				case 4: {
+					mycsdn.setUrl(Urls.NewsB_LIST);//资本动态
 					new MyTask().execute(mycsdn);
 					break;
+				}
+				case 5: {
+					mycsdn.setUrl(Urls.NewsM_LIST);//娱乐营销
+					new MyTask().execute(mycsdn);
+					break;
+				}
+				case 6: {
+					mycsdn.setUrl(Urls.NewsC_LIST);//政策法规
+					new MyTask().execute(mycsdn);
+					break;
+				}
+				case 7: {
+					mycsdn.setUrl(Urls.Interview_LIST);//人物访谈
+					new MyTask().execute(mycsdn);
+					break;
+				}
 				}
 			}
 		});
@@ -322,10 +340,17 @@ public class MainActivity extends BaseSlidingFragmentActivity implements
 				R.string.menuStudio), Constants.TAGS.WIKI_TAG);// 学习教程
 		NavigationModel nav4 = new NavigationModel(getResources().getString(
 				R.string.menuBlog), Constants.TAGS.BLOG_TAG);// 社区博客
-		NavigationModel nav5 = new NavigationModel(getResources().getString(R.string.menuInterview),
-				Constants.TAGS.NEWS_TAG);// 人物访谈
+		
+		NavigationModel nav5 = new NavigationModel(getResources().getString(
+				R.string.menuNewsB), Constants.TAGS.NEWS_TAG);// 资本动态		
+		NavigationModel nav6 = new NavigationModel(getResources().getString(
+				R.string.menuNewsM), Constants.TAGS.NEWS_TAG);// 娱乐营销
+		NavigationModel nav7 = new NavigationModel(getResources().getString(
+				R.string.menuNewsC), Constants.TAGS.NEWS_TAG);// 政策法规	
+		NavigationModel nav8 = new NavigationModel(getResources().getString(
+				R.string.menuInterview), Constants.TAGS.NEWS_TAG);//人物访谈
 
-		Collections.addAll(navs, nav1, nav2, nav3, nav4, nav5);
+		Collections.addAll(navs, nav1, nav2, nav3, nav4, nav5, nav6, nav7, nav8);
 	}
 
 	/**
@@ -363,6 +388,21 @@ public class MainActivity extends BaseSlidingFragmentActivity implements
 		map.put(LIST_IMAGEVIEW, R.drawable.dis_menu_blog);
 		list.add(map);
 
+		map = new HashMap<String, Object>();
+		map.put(LIST_TEXT, getResources().getString(R.string.menuNewsB));// 资本动态
+		map.put(LIST_IMAGEVIEW, R.drawable.dis_menu_news);
+		list.add(map);
+		
+		map = new HashMap<String, Object>();
+		map.put(LIST_TEXT, getResources().getString(R.string.menuNewsM));// 娱乐营销
+		map.put(LIST_IMAGEVIEW, R.drawable.dis_menu_news);
+		list.add(map);
+		
+		map = new HashMap<String, Object>();
+		map.put(LIST_TEXT, getResources().getString(R.string.menuNewsC));// 政策法规
+		map.put(LIST_IMAGEVIEW, R.drawable.dis_menu_news);
+		list.add(map);
+		
 		map = new HashMap<String, Object>();
 		map.put(LIST_TEXT, getResources().getString(R.string.menuInterview));// 人物访谈
 		map.put(LIST_IMAGEVIEW, R.drawable.dis_menu_news);
@@ -612,8 +652,8 @@ public class MainActivity extends BaseSlidingFragmentActivity implements
 					map.put("tabs", categorys);
 					map.put("list", categoryList);
 				}
-			} else if (dao instanceof MyCsdn) {
-				mUseCache=false;
+			} else if (dao instanceof MyCsdn) {				
+				mUseCache = false;
 				mTag = 1;
 				if ((newsResponseData = mycsdn.mapperJson(mUseCache)) != null) {
 

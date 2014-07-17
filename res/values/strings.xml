@@ -15,6 +15,10 @@
     <string name="menuNews">新闻资讯</string>
     <string name="menuStudio">学习教程</string>
     <string name="menuBlog">社区博客</string>        
+ 
+    <string name="menuNewsB">资本动态</string>
+     <string name="menuNewsM">娱乐营销</string>
+      <string name="menuNewsC">政策法规</string>
     <string name="menuInterview">人物访谈</string>
 
     <!-- 详情菜单 -->

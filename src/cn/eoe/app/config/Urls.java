@@ -68,9 +68,28 @@ public class Urls {
 	 */
 	public static final String KEYBindURL = BASIC_URL + "/userinfo?key=%s";
 	
+
+	/**
+	 * 资本动态
+	 */
+	public static final String NewsB_LIST = "http://news.entgroup.cn/b/index.shtml";
+	public static final String NewsB_LIST_Base = "http://news.entgroup.cn";
 	
 	/**
-	 * 专访
+	 * 娱乐营销
+	 */
+	public static final String NewsM_LIST = "http://news.entgroup.cn/m/index.shtml";
+	public static final String NewsM_LIST_Base = "http://news.entgroup.cn";
+	
+	/**
+	 * 政策法规
+	 */
+	public static final String NewsC_LIST = "http://news.entgroup.cn/c/index.shtml";
+	public static final String NewsC_LIST_Base = "http://news.entgroup.cn";
+	
+	/**
+	 * 人物访谈
 	 */
 	public static final String Interview_LIST = "http://interview.entgroup.cn/index.shtml";
+	public static final String Interview_LIST_Base = "http://interview.entgroup.cn";
 }

@@ -20,6 +20,7 @@ import android.os.Build;
 import android.os.Environment;
 import cn.eoe.app.config.Configs;
 import cn.eoe.app.config.Constants;
+import cn.eoe.app.config.Urls;
 import cn.eoe.app.db.DBHelper;
 import cn.eoe.app.db.RequestCacheColumn;
 import cn.eoe.app.https.HttpUtils;
@@ -229,19 +230,42 @@ public class RequestCacheUtil {
 					"index", "").replace(".shtml", ""));
 			if (curr < max) {
 				curr = curr + 1;
-				if (curr == max) {
-					moreUrl = "";
-				} else {
-					moreUrl = requestUrl.substring(0,
-							requestUrl.lastIndexOf("/") + 1)
-							+ "index" + curr + ".shtml";
-				}
+				moreUrl = requestUrl.substring(0,
+						requestUrl.lastIndexOf("/") + 1)
+						+ "index"
+						+ curr
+						+ ".shtml";
+			} else {
+				moreUrl = "";
+			}
+			
+			String ClassName="";
+			String BaseUrl="";
+			if(requestUrl.contains(Urls.NewsB_LIST.replace("index.shtml", "")))
+			{
+				ClassName="资本动态";
+				BaseUrl=Urls.NewsB_LIST_Base;
+			}
+			else if(requestUrl.contains(Urls.NewsM_LIST.replace("index.shtml", "")))
+			{
+				ClassName="娱乐营销";
+				BaseUrl=Urls.NewsM_LIST_Base;
+			}
+			else if(requestUrl.contains(Urls.NewsC_LIST.replace("index.shtml", "")))
+			{
+				ClassName="政策法规";
+				BaseUrl=Urls.NewsC_LIST_Base;
+			}
+			else if(requestUrl.contains(Urls.Interview_LIST.replace("index.shtml", "")))
+			{
+				ClassName="人物访谈";
+				BaseUrl=Urls.Interview_LIST_Base;
 			}
 
 			if (curr == 1) {
-				result = extracted(requestUrl, doc, moreUrl);
+				result = extracted(requestUrl, doc, moreUrl,ClassName,BaseUrl);
 			} else {
-				result = extracted2(requestUrl, doc, moreUrl);
+				result = extracted2(requestUrl, doc, moreUrl,ClassName,BaseUrl);
 			}
 		} else if (!requestUrl.contains("entgroup")) {
 			try {
@@ -266,10 +290,10 @@ public class RequestCacheUtil {
 	 * 列表首次加载
 	 */
 	private static String extracted(String requestUrl, Document doc,
-			String moreUrl) {
+			String moreUrl,String ClassName,String BaseUrl) {
 		String result;
-		result = "{\"response\":{\"date\":1405412322,\"categorys\":[{\"name\":\"人物访谈\",\"url\":\"http://api.eoe.cn//client/news?k=lists&t=new\"}], "
-				+ " \"list\":[{\"name\":\"人物访谈\",\"more_url\":\""
+		result = "{\"response\":{\"date\":1405412322,\"categorys\":[{\"name\":\""+ClassName+"\",\"url\":\"http://api.eoe.cn//client/news?k=lists&t=new\"}], "
+				+ " \"list\":[{\"name\":\""+ClassName+"\",\"more_url\":\""
 				+ moreUrl
 				+ "\",\"items\":[ ";
 
@@ -282,7 +306,7 @@ public class RequestCacheUtil {
 
 			String title = ele.getElementsByTag("a").get(0).html();
 			String desc = ele.getElementsByTag("p").get(0).text();
-			String url = requestUrl.substring(0, requestUrl.lastIndexOf("/"))
+			String url = BaseUrl
 					+ ele.getElementsByTag("a").get(0).attributes().get("href");
 
 			if (i < eles.size() - 1) {
@@ -306,9 +330,9 @@ public class RequestCacheUtil {
 	 * 列表加载more
 	 */
 	private static String extracted2(String requestUrl, Document doc,
-			String moreUrl) {
+			String moreUrl,String ClassName,String BaseUrl) {
 		String result;
-		result = "{\"response\":{\"name\":\"人物访谈\",\"more_url\":\"" + moreUrl
+		result = "{\"response\":{\"name\":\""+ClassName+"\",\"more_url\":\"" + moreUrl
 				+ "\", " + " \"items\":[ ";
 
 		Elements eles = doc.getElementsByClass("listbox").get(0)
@@ -318,12 +342,16 @@ public class RequestCacheUtil {
 		for (int i = 0; i < eles.size(); i++) {
 			Element ele = eles.get(i);
 
-			String title = ele.getElementsByTag("a").get(0).html().replace(",", "\\,");
-			String desc = ele.getElementsByTag("p").get(0).text().replace(",", "\\,");
-			String url = requestUrl.substring(0, requestUrl.lastIndexOf("/"))
-					+ ele.getElementsByTag("a").get(0).attributes().get("href").replace(",", "\\,");
-			
-			desc=desc.replace("(", "").replace(")", "").replace(",", "");
+			String title = ele.getElementsByTag("a").get(0).html()
+					.replace(",", "\\,");
+			String desc = ele.getElementsByTag("p").get(0).text()
+					.replace(",", "\\,");
+			String url = BaseUrl
+					+ ele.getElementsByTag("a").get(0).attributes().get("href")
+							.replace(",", "\\,");
+
+			desc = desc.replace("(", "").replace(")", "").replace(",", "")
+					.replace("\"", "").replace("?", "？").replace("\\", "");
 
 			if (i < eles.size() - 1) {
 				result += " {\"id\":\"18633\",\"thumbnail_url\":\"\",\"title\":\""
