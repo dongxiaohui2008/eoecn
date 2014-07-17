@@ -33,18 +33,28 @@ public class BasePageAdapter extends FragmentStatePagerAdapter {
 	}
 
 	public void addFragment(List<CategorysEntity> mList, List<Object> listObject) {
+		
 		tabs.addAll(mList);
+		
 		for (int i = 0; i < listObject.size(); i++) {
+			
 			Object object = listObject.get(i);
+			
 			if (object instanceof NewsCategoryListEntity) {
+				
 				addTab(new NewsFragment(mActivity,
 						((NewsCategoryListEntity) listObject.get(i))));
+				
 			} else if (object instanceof BlogsCategoryListEntity) {
+				
 				addTab(new BlogFragment(mActivity,
 						((BlogsCategoryListEntity) listObject.get(i))));
+				
 			} else if (object instanceof WikiCategoryListEntity) {
+				
 				addTab(new WikiFragment(mActivity,
 						((WikiCategoryListEntity) listObject.get(i))));
+				
 			}
 		}
 	}
@@ -91,6 +101,10 @@ public class BasePageAdapter extends FragmentStatePagerAdapter {
 
 	@Override
 	public CharSequence getPageTitle(int position) {
+		if(tabs.size()==0)
+		{
+			return "";
+		}
 		return tabs.get(position).getName();
 	}
 

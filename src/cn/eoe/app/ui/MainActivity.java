@@ -70,7 +70,7 @@ public class MainActivity extends BaseSlidingFragmentActivity implements
 
 	// [start]变量
 	/**
-	 * 数字代表列表顺序
+	 * 侧滑菜单顺序
 	 */
 	private int mTag = 0;
 
@@ -222,10 +222,7 @@ public class MainActivity extends BaseSlidingFragmentActivity implements
 	 * 初始化业务类
 	 */
 	private void initClass() {
-		blogsDao = new BlogsDao(this);
 		newsDao = new NewsDao(this);
-		wikiDao = new WikiDao(this);
-		topDao = new TopDao(this);
 		mycsdn = new MyCsdn(this);
 	}
 
@@ -241,7 +238,7 @@ public class MainActivity extends BaseSlidingFragmentActivity implements
 		mIndicator.setViewPager(mViewPager);
 		mIndicator.setOnPageChangeListener(new MyPageChangeListener());
 
-		new MyTask().execute(topDao);
+		new MyTask().execute(newsDao);// 产业资讯
 	}
 
 	/**
@@ -290,35 +287,25 @@ public class MainActivity extends BaseSlidingFragmentActivity implements
 				imgQuery.setVisibility(View.VISIBLE);
 				switch (position) {
 				case 0:
-					imgQuery.setVisibility(View.GONE);
-					new MyTask().execute(topDao);
+					new MyTask().execute(newsDao);// 产业资讯
 					break;
-				case 1:
-					new MyTask().execute(newsDao);
+				case 1: {
+					mycsdn.setUrl(Urls.NewsB_LIST);// 资本动态
+					new MyTask().execute(mycsdn);
 					break;
-				case 2:
-					new MyTask().execute(wikiDao);
+				}
+				case 2: {
+					mycsdn.setUrl(Urls.NewsM_LIST);// 娱乐营销
+					new MyTask().execute(mycsdn);
 					break;
-				case 3:
-					new MyTask().execute(blogsDao);
+				}
+				case 3: {
+					mycsdn.setUrl(Urls.NewsC_LIST);// 政策法规
+					new MyTask().execute(mycsdn);
 					break;
+				}
 				case 4: {
-					mycsdn.setUrl(Urls.NewsB_LIST);//资本动态
-					new MyTask().execute(mycsdn);
-					break;
-				}
-				case 5: {
-					mycsdn.setUrl(Urls.NewsM_LIST);//娱乐营销
-					new MyTask().execute(mycsdn);
-					break;
-				}
-				case 6: {
-					mycsdn.setUrl(Urls.NewsC_LIST);//政策法规
-					new MyTask().execute(mycsdn);
-					break;
-				}
-				case 7: {
-					mycsdn.setUrl(Urls.Interview_LIST);//人物访谈
+					mycsdn.setUrl(Urls.Interview_LIST);// 人物访谈
 					new MyTask().execute(mycsdn);
 					break;
 				}
@@ -332,25 +319,19 @@ public class MainActivity extends BaseSlidingFragmentActivity implements
 	 */
 	private void initNav() {
 		navs = new ArrayList<NavigationModel>();
-		NavigationModel nav1 = new NavigationModel(getResources().getString(
-				R.string.menuGood), "");// 社区精选
-		NavigationModel nav2 = new NavigationModel(getResources().getString(
-				R.string.menuNews), Constants.TAGS.NEWS_TAG);// 新闻资讯
-		NavigationModel nav3 = new NavigationModel(getResources().getString(
-				R.string.menuStudio), Constants.TAGS.WIKI_TAG);// 学习教程
-		NavigationModel nav4 = new NavigationModel(getResources().getString(
-				R.string.menuBlog), Constants.TAGS.BLOG_TAG);// 社区博客
-		
-		NavigationModel nav5 = new NavigationModel(getResources().getString(
-				R.string.menuNewsB), Constants.TAGS.NEWS_TAG);// 资本动态		
-		NavigationModel nav6 = new NavigationModel(getResources().getString(
-				R.string.menuNewsM), Constants.TAGS.NEWS_TAG);// 娱乐营销
-		NavigationModel nav7 = new NavigationModel(getResources().getString(
-				R.string.menuNewsC), Constants.TAGS.NEWS_TAG);// 政策法规	
-		NavigationModel nav8 = new NavigationModel(getResources().getString(
-				R.string.menuInterview), Constants.TAGS.NEWS_TAG);//人物访谈
 
-		Collections.addAll(navs, nav1, nav2, nav3, nav4, nav5, nav6, nav7, nav8);
+		NavigationModel nav1 = new NavigationModel(getResources().getString(
+				R.string.menuNewsA), Constants.TAGS.NEWS_TAG);// 产业资讯
+		NavigationModel nav2 = new NavigationModel(getResources().getString(
+				R.string.menuNewsB), Constants.TAGS.NEWS_TAG);// 资本动态
+		NavigationModel nav3 = new NavigationModel(getResources().getString(
+				R.string.menuNewsM), Constants.TAGS.NEWS_TAG);// 娱乐营销
+		NavigationModel nav4 = new NavigationModel(getResources().getString(
+				R.string.menuNewsC), Constants.TAGS.NEWS_TAG);// 政策法规
+		NavigationModel nav5 = new NavigationModel(getResources().getString(
+				R.string.menuInterview), Constants.TAGS.NEWS_TAG);// 人物访谈
+
+		Collections.addAll(navs, nav1, nav2, nav3, nav4, nav5);
 	}
 
 	/**
@@ -369,40 +350,27 @@ public class MainActivity extends BaseSlidingFragmentActivity implements
 		List<Map<String, Object>> list = new ArrayList<Map<String, Object>>();
 
 		Map<String, Object> map = new HashMap<String, Object>();
-		map.put(LIST_TEXT, getResources().getString(R.string.menuGood));// 社区精选
-		map.put(LIST_IMAGEVIEW, R.drawable.dis_menu_handpick);
-		list.add(map);
 
 		map = new HashMap<String, Object>();
-		map.put(LIST_TEXT, getResources().getString(R.string.menuNews));// 新闻资讯
+		map.put(LIST_TEXT, getResources().getString(R.string.menuNewsA));// 产业资讯
 		map.put(LIST_IMAGEVIEW, R.drawable.dis_menu_news);
-		list.add(map);
-
-		map = new HashMap<String, Object>();
-		map.put(LIST_TEXT, getResources().getString(R.string.menuStudio));// 学习教程
-		map.put(LIST_IMAGEVIEW, R.drawable.dis_menu_studio);
-		list.add(map);
-
-		map = new HashMap<String, Object>();
-		map.put(LIST_TEXT, getResources().getString(R.string.menuBlog));// 社区博客
-		map.put(LIST_IMAGEVIEW, R.drawable.dis_menu_blog);
 		list.add(map);
 
 		map = new HashMap<String, Object>();
 		map.put(LIST_TEXT, getResources().getString(R.string.menuNewsB));// 资本动态
 		map.put(LIST_IMAGEVIEW, R.drawable.dis_menu_news);
 		list.add(map);
-		
+
 		map = new HashMap<String, Object>();
 		map.put(LIST_TEXT, getResources().getString(R.string.menuNewsM));// 娱乐营销
 		map.put(LIST_IMAGEVIEW, R.drawable.dis_menu_news);
 		list.add(map);
-		
+
 		map = new HashMap<String, Object>();
 		map.put(LIST_TEXT, getResources().getString(R.string.menuNewsC));// 政策法规
 		map.put(LIST_IMAGEVIEW, R.drawable.dis_menu_news);
 		list.add(map);
-		
+
 		map = new HashMap<String, Object>();
 		map.put(LIST_TEXT, getResources().getString(R.string.menuInterview));// 人物访谈
 		map.put(LIST_IMAGEVIEW, R.drawable.dis_menu_news);
@@ -621,38 +589,17 @@ public class MainActivity extends BaseSlidingFragmentActivity implements
 			BaseDao dao = params[0];
 			List<CategorysEntity> categorys = new ArrayList<CategorysEntity>();
 			Map<String, Object> map = new HashMap<String, Object>();
-			if (dao instanceof TopDao) {
+			if (dao instanceof NewsDao) {
 				mTag = 0;
-				if ((categoryList = topDao.mapperJson(mUseCache)) != null) {
-					categorys = topDao.getCategorys();
-					map.put("tabs", categorys);
-					map.put("list", categoryList);
-				}
-			} else if (dao instanceof BlogsDao) {
-				mTag = 3;
-				if ((responseData = blogsDao.mapperJson(mUseCache)) != null) {
-					categoryList = (List) responseData.getList();
-					categorys = responseData.getCategorys();
-					map.put("tabs", categorys);
-					map.put("list", categoryList);
-				}
-			} else if (dao instanceof NewsDao) {
-				mTag = 1;
 				if ((newsResponseData = newsDao.mapperJson(mUseCache)) != null) {
+
 					categoryList = (List) newsResponseData.getList();
 					categorys = newsResponseData.getCategorys();
+
 					map.put("tabs", categorys);
 					map.put("list", categoryList);
 				}
-			} else if (dao instanceof WikiDao) {
-				mTag = 2;
-				if ((wikiResponseData = wikiDao.mapperJson(mUseCache)) != null) {
-					categoryList = (List) wikiResponseData.getList();
-					categorys = wikiResponseData.getCategorys();
-					map.put("tabs", categorys);
-					map.put("list", categoryList);
-				}
-			} else if (dao instanceof MyCsdn) {				
+			} else if (dao instanceof MyCsdn) {
 				mUseCache = false;
 				mTag = 1;
 				if ((newsResponseData = mycsdn.mapperJson(mUseCache)) != null) {
@@ -678,10 +625,19 @@ public class MainActivity extends BaseSlidingFragmentActivity implements
 			mViewPager.removeAllViews();
 
 			if (!result.isEmpty()) {
-				mBasePageAdapter.addFragment((List) result.get("tabs"),
-						(List) result.get("list"));
+				if (((List) result.get("tabs")).size() == 1) {
+					mBasePageAdapter.addFragment((List) result.get("tabs"),
+							(List) result.get("list"));
+					
+					imgRight.setVisibility(View.GONE);
+					imgLeft.setVisibility(View.GONE);
+				} else {
+					mBasePageAdapter.addFragment((List) result.get("tabs"),
+							(List) result.get("list"));
+					
+					imgRight.setVisibility(View.VISIBLE);
+				}
 
-				imgRight.setVisibility(View.VISIBLE);
 				loadLayout.setVisibility(View.GONE);
 				loadFaillayout.setVisibility(View.GONE);
 			} else {
@@ -712,7 +668,7 @@ public class MainActivity extends BaseSlidingFragmentActivity implements
 		@Override
 		public void onPageSelected(int arg0) {
 			if (arg0 == 0) {
-				imgLeft.setVisibility(View.GONE);// ViewPager导航指示箭头
+				imgLeft.setVisibility(View.GONE);// 左
 
 				getSlidingMenu().setTouchModeAbove(
 						SlidingMenu.TOUCHMODE_FULLSCREEN);
