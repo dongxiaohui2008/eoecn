@@ -16,6 +16,7 @@ import android.content.SharedPreferences.Editor;
 import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
 import android.support.v4.view.ViewPager.OnPageChangeListener;
 import android.view.KeyEvent;
@@ -53,6 +54,7 @@ import cn.eoe.app.db.DBHelper;
 import cn.eoe.app.entity.BlogsResponseEntity;
 import cn.eoe.app.entity.CategorysEntity;
 import cn.eoe.app.entity.NavigationModel;
+import cn.eoe.app.entity.NewsCategoryListEntity;
 import cn.eoe.app.entity.NewsResponseEntity;
 import cn.eoe.app.entity.WikiResponseEntity;
 import cn.eoe.app.https.NetWorkHelper;
@@ -61,6 +63,8 @@ import cn.eoe.app.slidingmenu.SlidingMenu;
 import cn.eoe.app.ui.base.BaseSlidingFragmentActivity;
 import cn.eoe.app.utils.IntentUtil;
 import cn.eoe.app.utils.PopupWindowUtil;
+import cn.eoe.app.view.HttpErrorFragment;
+import cn.eoe.app.view.NewsFragment;
 import cn.eoe.app.widget.CustomButton;
 
 public class MainActivity extends BaseSlidingFragmentActivity implements
@@ -97,7 +101,7 @@ public class MainActivity extends BaseSlidingFragmentActivity implements
 	// init daos
 	private TopDao topDao;
 	private BlogsDao blogsDao;
-	private NewsDao newsDao;
+	// private NewsDao newsDao;
 	private WikiDao wikiDao;
 	private MyCsdn mycsdn;
 
@@ -125,7 +129,7 @@ public class MainActivity extends BaseSlidingFragmentActivity implements
 
 	private InputMethodManager imm;
 
-	private boolean isShowPopupWindows = false;// 下拉菜单
+	private boolean isShowPopupWindows = false;// 下拉菜单	
 
 	// [end]
 
@@ -183,7 +187,7 @@ public class MainActivity extends BaseSlidingFragmentActivity implements
 		loadFaillayout = (LinearLayout) findViewById(R.id.view_load_fail);
 
 		mAboveTitle = (TextView) findViewById(R.id.tv_above_title);
-		mAboveTitle.setText("社区精选");
+		mAboveTitle.setText("产业资讯");
 
 		// 头部搜索按钮
 		imgQuery = (ImageView) findViewById(R.id.imageview_above_query);
@@ -222,7 +226,7 @@ public class MainActivity extends BaseSlidingFragmentActivity implements
 	 * 初始化业务类
 	 */
 	private void initClass() {
-		newsDao = new NewsDao(this);
+		// newsDao = new NewsDao(this);
 		mycsdn = new MyCsdn(this);
 	}
 
@@ -238,7 +242,9 @@ public class MainActivity extends BaseSlidingFragmentActivity implements
 		mIndicator.setViewPager(mViewPager);
 		mIndicator.setOnPageChangeListener(new MyPageChangeListener());
 
-		new MyTask().execute(newsDao);// 产业资讯
+		// new MyTask().execute(newsDao);// 产业资讯
+		mycsdn.setUrl(Urls.NewsA_LIST);// 产业资讯
+		new MyTask().execute(mycsdn);
 	}
 
 	/**
@@ -287,7 +293,8 @@ public class MainActivity extends BaseSlidingFragmentActivity implements
 				imgQuery.setVisibility(View.VISIBLE);
 				switch (position) {
 				case 0:
-					new MyTask().execute(newsDao);// 产业资讯
+					mycsdn.setUrl(Urls.NewsA_LIST);// 产业资讯
+					new MyTask().execute(mycsdn);
 					break;
 				case 1: {
 					mycsdn.setUrl(Urls.NewsB_LIST);// 资本动态
@@ -436,7 +443,7 @@ public class MainActivity extends BaseSlidingFragmentActivity implements
 				new MyTask().execute(topDao);
 				break;
 			case 1:
-				new MyTask().execute(newsDao);
+				// new MyTask().execute(newsDao);
 				break;
 			case 2:
 				new MyTask().execute(wikiDao);
@@ -572,15 +579,15 @@ public class MainActivity extends BaseSlidingFragmentActivity implements
 		// 最终用户调用Excute时的接口，当任务执行之前开始调用此方法，可以在这里显示进度对话框
 		@Override
 		protected void onPreExecute() {
-			imgLeft.setVisibility(View.GONE);
-			imgRight.setVisibility(View.GONE);
-			loadLayout.setVisibility(View.VISIBLE);
-			mViewPager.setVisibility(View.GONE);
-			mViewPager.removeAllViews();
-			mBasePageAdapter.Clear();
-			MainActivity.this.showContent();
-			super.onPreExecute();
-			isShowPopupWindows = false;
+				imgLeft.setVisibility(View.GONE);
+				imgRight.setVisibility(View.GONE);
+				loadLayout.setVisibility(View.VISIBLE);
+				mViewPager.setVisibility(View.GONE);
+				mViewPager.removeAllViews();
+				mBasePageAdapter.Clear();
+				MainActivity.this.showContent();
+				super.onPreExecute();
+				isShowPopupWindows = false;
 		}
 
 		// 后台执行，比较耗时的操作都可以放在这里。
@@ -589,19 +596,9 @@ public class MainActivity extends BaseSlidingFragmentActivity implements
 			BaseDao dao = params[0];
 			List<CategorysEntity> categorys = new ArrayList<CategorysEntity>();
 			Map<String, Object> map = new HashMap<String, Object>();
-			if (dao instanceof NewsDao) {
-				mTag = 0;
-				if ((newsResponseData = newsDao.mapperJson(mUseCache)) != null) {
-
-					categoryList = (List) newsResponseData.getList();
-					categorys = newsResponseData.getCategorys();
-
-					map.put("tabs", categorys);
-					map.put("list", categoryList);
-				}
-			} else if (dao instanceof MyCsdn) {
-				mUseCache = false;
-				mTag = 1;
+			if (dao instanceof MyCsdn) {
+				mUseCache = true;
+				// mTag = 1;
 				if ((newsResponseData = mycsdn.mapperJson(mUseCache)) != null) {
 
 					categorys = newsResponseData.getCategorys();
@@ -620,35 +617,37 @@ public class MainActivity extends BaseSlidingFragmentActivity implements
 		protected void onPostExecute(Map<String, Object> result) {
 			super.onPostExecute(result);
 
-			isShowPopupWindows = true;
-			mBasePageAdapter.Clear();
-			mViewPager.removeAllViews();
+				isShowPopupWindows = true;
+				mBasePageAdapter.Clear();
+				mViewPager.removeAllViews();
 
-			if (!result.isEmpty()) {
-				if (((List) result.get("tabs")).size() == 1) {
-					mBasePageAdapter.addFragment((List) result.get("tabs"),
-							(List) result.get("list"));
-					
-					imgRight.setVisibility(View.GONE);
-					imgLeft.setVisibility(View.GONE);
+				if (!result.isEmpty()) {
+					if (((List) result.get("tabs")).size() == 1) {
+						// ViewPager：预加载下一页
+						mBasePageAdapter.addFragment((List) result.get("tabs"),
+								(List) result.get("list"));
+
+						imgRight.setVisibility(View.GONE);
+						imgLeft.setVisibility(View.GONE);
+					} else {
+						mBasePageAdapter.addFragment((List) result.get("tabs"),
+								(List) result.get("list"));
+
+						imgRight.setVisibility(View.VISIBLE);
+					}
+
+					loadLayout.setVisibility(View.GONE);
+					loadFaillayout.setVisibility(View.GONE);
 				} else {
-					mBasePageAdapter.addFragment((List) result.get("tabs"),
-							(List) result.get("list"));
-					
-					imgRight.setVisibility(View.VISIBLE);
+					mBasePageAdapter.addNullFragment();
+					loadLayout.setVisibility(View.GONE);
+					loadFaillayout.setVisibility(View.VISIBLE);
 				}
-
-				loadLayout.setVisibility(View.GONE);
-				loadFaillayout.setVisibility(View.GONE);
-			} else {
-				mBasePageAdapter.addNullFragment();
-				loadLayout.setVisibility(View.GONE);
-				loadFaillayout.setVisibility(View.VISIBLE);
-			}
-			mViewPager.setVisibility(View.VISIBLE);
-			mBasePageAdapter.notifyDataSetChanged();
-			mViewPager.setCurrentItem(0);
-			mIndicator.notifyDataSetChanged();
+				mViewPager.setVisibility(View.VISIBLE);
+				mBasePageAdapter.notifyDataSetChanged();
+				mViewPager.setCurrentItem(0);
+				mIndicator.notifyDataSetChanged();
+			
 		}
 	}
 
@@ -672,6 +671,7 @@ public class MainActivity extends BaseSlidingFragmentActivity implements
 
 				getSlidingMenu().setTouchModeAbove(
 						SlidingMenu.TOUCHMODE_FULLSCREEN);
+
 			} else if (arg0 == mBasePageAdapter.mFragments.size() - 1) {
 				imgRight.setVisibility(View.GONE);
 

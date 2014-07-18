@@ -207,9 +207,21 @@ public class RequestCacheUtil {
 			}
 
 			// 列表页
-			Document doc = null;
+			Document doc = null;//产业资讯
+			Document doc2 = null;//电影产业
+			Document doc3 = null;//游戏产业
 			try {
-				doc = Jsoup.connect(requestUrl).timeout(5000).get();
+				//产业资讯特殊处理
+				if (requestUrl.contains(Urls.NewsA_LIST.replace(
+						"index.shtml", ""))) {
+					doc = Jsoup.connect(Urls.NewsA_LIST).timeout(8000).get();
+					doc2=Jsoup.connect(Urls.NewsMovie_LIST).timeout(8000).get();
+					doc3=Jsoup.connect(Urls.NewsGame_LIST).timeout(8000).get();
+				}
+				else
+				{
+					doc = Jsoup.connect(requestUrl).timeout(5000).get();
+				}
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
@@ -238,34 +250,49 @@ public class RequestCacheUtil {
 			} else {
 				moreUrl = "";
 			}
-			
-			String ClassName="";
-			String BaseUrl="";
-			if(requestUrl.contains(Urls.NewsB_LIST.replace("index.shtml", "")))
-			{
-				ClassName="资本动态";
-				BaseUrl=Urls.NewsB_LIST_Base;
-			}
-			else if(requestUrl.contains(Urls.NewsM_LIST.replace("index.shtml", "")))
-			{
-				ClassName="娱乐营销";
-				BaseUrl=Urls.NewsM_LIST_Base;
-			}
-			else if(requestUrl.contains(Urls.NewsC_LIST.replace("index.shtml", "")))
-			{
-				ClassName="政策法规";
-				BaseUrl=Urls.NewsC_LIST_Base;
-			}
-			else if(requestUrl.contains(Urls.Interview_LIST.replace("index.shtml", "")))
-			{
-				ClassName="人物访谈";
-				BaseUrl=Urls.Interview_LIST_Base;
+
+			String ClassName = "";
+			String BaseUrl = "";
+			if (requestUrl.contains(Urls.NewsB_LIST.replace("index.shtml", ""))) {
+				ClassName = "资本动态";
+				BaseUrl = Urls.NewsB_LIST_Base;
+			} else if (requestUrl.contains(Urls.NewsM_LIST.replace(
+					"index.shtml", ""))) {
+				ClassName = "娱乐营销";
+				BaseUrl = Urls.NewsM_LIST_Base;
+			} else if (requestUrl.contains(Urls.NewsC_LIST.replace(
+					"index.shtml", ""))) {
+				ClassName = "政策法规";
+				BaseUrl = Urls.NewsC_LIST_Base;
+			} else if (requestUrl.contains(Urls.Interview_LIST.replace(
+					"index.shtml", ""))) {
+				ClassName = "人物访谈";
+				BaseUrl = Urls.Interview_LIST_Base;
+			} else if (requestUrl.contains(Urls.NewsA_LIST.replace(
+					"index.shtml", ""))) {
+				ClassName = "产业资讯";
+				BaseUrl = Urls.NewsA_LIST_Base;
+			} else if (requestUrl.contains(Urls.NewsMovie_LIST.replace(
+					"index.shtml", ""))) {
+				ClassName = "电影产业";
+				BaseUrl = Urls.NewsMovie_LIST_Base;
+			} else if (requestUrl.contains(Urls.NewsGame_LIST.replace(
+					"index.shtml", ""))) {
+				ClassName = "游戏产业";
+				BaseUrl = Urls.NewsGame_LIST_Base;
 			}
 
 			if (curr == 1) {
-				result = extracted(requestUrl, doc, moreUrl,ClassName,BaseUrl);
+				if (ClassName.equals("产业资讯")) {
+					result = extracted0(requestUrl, doc,doc2,doc3, moreUrl, ClassName,
+							BaseUrl);
+				} else {
+					result = extracted1(requestUrl, doc, moreUrl, ClassName,
+							BaseUrl);
+				}
 			} else {
-				result = extracted2(requestUrl, doc, moreUrl,ClassName,BaseUrl);
+				result = extracted2(requestUrl, doc, moreUrl, ClassName,
+						BaseUrl);
 			}
 		} else if (!requestUrl.contains("entgroup")) {
 			try {
@@ -287,16 +314,33 @@ public class RequestCacheUtil {
 	}
 
 	/**
-	 * 列表首次加载
+	 * 产业资讯-首次加载
 	 */
-	private static String extracted(String requestUrl, Document doc,
-			String moreUrl,String ClassName,String BaseUrl) {
+	private static String extracted0(String requestUrl, Document doc,Document doc2,Document doc3,
+			String moreUrl, String ClassName, String BaseUrl) {
 		String result;
-		result = "{\"response\":{\"date\":1405412322,\"categorys\":[{\"name\":\""+ClassName+"\",\"url\":\"http://api.eoe.cn//client/news?k=lists&t=new\"}], "
-				+ " \"list\":[{\"name\":\""+ClassName+"\",\"more_url\":\""
-				+ moreUrl
-				+ "\",\"items\":[ ";
+		result = "{\"response\":{\"date\":1405412322,"
+				+
 
+				"\"categorys\":["
+				+ "{\"name\":\""
+				+ "产业资讯"
+				+ "\",\"url\":\"http://api.eoe.cn//client/news?k=lists&t=new\"}"
+
+				+ ",{\"name\":\""
+				+ "电影产业"
+				+ "\",\"url\":\"http://api.eoe.cn//client/news?k=lists&t=new\"}"
+
+				+ ",{\"name\":\""
+				+ "游戏产业"
+				+ "\",\"url\":\"http://api.eoe.cn//client/news?k=lists&t=new\"}"
+
+				+ "], "
+
+				+ " \"list\":[" +
+
+				"{\"name\":\"产业资讯 \"," + "\"more_url\":\"" + Urls.NewsA_LIST
+				+ "\"," + "\"items\":[ ";
 		Elements eles = doc.getElementsByClass("listbox").get(0)
 				.getElementsByTag("li");
 		long nowTime = System.currentTimeMillis();
@@ -321,8 +365,118 @@ public class RequestCacheUtil {
 						+ desc + "\",\"detail_url\":\"" + url + "\"} ";
 			}
 		}
+		result += " ]}" +
 
-		result += " ]}]}}";
+		",{\"name\":\"电影产业\"," + "\"more_url\":\"" + Urls.NewsMovie_LIST
+				+ "\"," + "\"items\":[ ";
+		
+		 eles = doc2.getElementsByClass("listbox").get(0)
+				.getElementsByTag("li");
+		
+		 for (int i = 0; i < eles.size(); i++) {
+		 Element ele = eles.get(i);
+		
+		 String title = ele.getElementsByTag("a").get(0).html();
+		 String desc = ele.getElementsByTag("p").get(0).text();
+		 String url = BaseUrl
+		 + ele.getElementsByTag("a").get(0).attributes().get("href");
+		
+		 if (i < eles.size() - 1) {
+		 result += " {\"id\":\"18633\",\"thumbnail_url\":\"\",\"title\":\""
+		 + title
+		 + "\",\"time\":\"1405303382\",\"short_content\":\""
+		 + desc + "\",\"detail_url\":\"" + url + "\"}, ";
+		 } else {
+		 result += " {\"id\":\"18633\",\"thumbnail_url\":\"\",\"title\":\""
+		 + title
+		 + "\",\"time\":\"1405303382\",\"short_content\":\""
+		 + desc + "\",\"detail_url\":\"" + url + "\"} ";
+		 }
+		 }
+		result += " ]}" +
+
+				
+		
+		",{\"name\":\"游戏产业\"," + "\"more_url\":\"" + Urls.NewsGame_LIST + "\","
+				+ "\"items\":[ ";
+		
+		 eles = doc3.getElementsByClass("listbox").get(0)
+					.getElementsByTag("li");
+		
+		 for (int i = 0; i < eles.size(); i++) {
+		 Element ele = eles.get(i);		
+		 String title = ele.getElementsByTag("a").get(0).html();
+		 String desc = ele.getElementsByTag("p").get(0).text();
+		 String url = BaseUrl
+		 + ele.getElementsByTag("a").get(0).attributes().get("href");
+		
+		 if (i < eles.size() - 1) {
+		 result += " {\"id\":\"18633\",\"thumbnail_url\":\"\",\"title\":\""
+		 + title
+		 + "\",\"time\":\"1405303382\",\"short_content\":\""
+		 + desc + "\",\"detail_url\":\"" + url + "\"}, ";
+		 } else {
+		 result += " {\"id\":\"18633\",\"thumbnail_url\":\"\",\"title\":\""
+		 + title
+		 + "\",\"time\":\"1405303382\",\"short_content\":\""
+		 + desc + "\",\"detail_url\":\"" + url + "\"} ";
+		 }
+		 }
+		result += " ]}" +
+		 
+				
+		
+
+		"]}}";
+		return result;
+	}
+
+	/**
+	 * 列表首次加载
+	 */
+	private static String extracted1(String requestUrl, Document doc,
+			String moreUrl, String ClassName, String BaseUrl) {
+		String result;
+		result = "{\"response\":{\"date\":1405412322,"
+				+
+
+				"\"categorys\":["
+				+ "{\"name\":\""
+				+ ClassName
+				+ "\",\"url\":\"http://api.eoe.cn//client/news?k=lists&t=new\"}"
+				+ "], "
+
+				+ " \"list\":[" +
+
+				"{\"name\":\"" + ClassName + "\"," + "\"more_url\":\""
+				+ moreUrl + "\"," + "\"items\":[ ";
+		Elements eles = doc.getElementsByClass("listbox").get(0)
+				.getElementsByTag("li");
+		long nowTime = System.currentTimeMillis();
+
+		for (int i = 0; i < eles.size(); i++) {
+			Element ele = eles.get(i);
+
+			String title = ele.getElementsByTag("a").get(0).html();
+			String desc = ele.getElementsByTag("p").get(0).text();
+			String url = BaseUrl
+					+ ele.getElementsByTag("a").get(0).attributes().get("href");
+
+			if (i < eles.size() - 1) {
+				result += " {\"id\":\"18633\",\"thumbnail_url\":\"\",\"title\":\""
+						+ title
+						+ "\",\"time\":\"1405303382\",\"short_content\":\""
+						+ desc + "\",\"detail_url\":\"" + url + "\"}, ";
+			} else {
+				result += " {\"id\":\"18633\",\"thumbnail_url\":\"\",\"title\":\""
+						+ title
+						+ "\",\"time\":\"1405303382\",\"short_content\":\""
+						+ desc + "\",\"detail_url\":\"" + url + "\"} ";
+			}
+		}
+		result += " ]}" +
+
+		"]}}";
 		return result;
 	}
 
@@ -330,10 +484,10 @@ public class RequestCacheUtil {
 	 * 列表加载more
 	 */
 	private static String extracted2(String requestUrl, Document doc,
-			String moreUrl,String ClassName,String BaseUrl) {
+			String moreUrl, String ClassName, String BaseUrl) {
 		String result;
-		result = "{\"response\":{\"name\":\""+ClassName+"\",\"more_url\":\"" + moreUrl
-				+ "\", " + " \"items\":[ ";
+		result = "{\"response\":{\"name\":\"" + ClassName
+				+ "\",\"more_url\":\"" + moreUrl + "\", " + " \"items\":[ ";
 
 		Elements eles = doc.getElementsByClass("listbox").get(0)
 				.getElementsByTag("li");

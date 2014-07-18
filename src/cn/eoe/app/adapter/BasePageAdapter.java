@@ -43,7 +43,7 @@ public class BasePageAdapter extends FragmentStatePagerAdapter {
 			if (object instanceof NewsCategoryListEntity) {
 				
 				addTab(new NewsFragment(mActivity,
-						((NewsCategoryListEntity) listObject.get(i))));
+						((NewsCategoryListEntity) listObject.get(i))));//新闻
 				
 			} else if (object instanceof BlogsCategoryListEntity) {
 				
@@ -86,6 +86,7 @@ public class BasePageAdapter extends FragmentStatePagerAdapter {
 		CategorysEntity cate = new CategorysEntity();
 		cate.setName("连接错误");
 		tabs.add(cate);		
+		
 		addTab(new HttpErrorFragment());//404。。没有相关数据。。
 	}
 

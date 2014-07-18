@@ -27,7 +27,7 @@ import cn.eoe.app.utils.ImageUtil;
 public class NewsFragment extends BaseListFragment {
 
 	public Activity mActivity;
-	private List<NewsContentItem> items_list = new ArrayList<NewsContentItem>();//当前-资讯列表
+	public List<NewsContentItem> items_list = new ArrayList<NewsContentItem>();//当前-资讯列表
 	private String more_url;//加载更多地址
 	private MyAdapter mAdapter;//适配器
 	private NewsCategoryListEntity loadMoreEntity;//更多-资讯列表
@@ -56,8 +56,11 @@ public class NewsFragment extends BaseListFragment {
 	public NewsFragment(Activity c, NewsCategoryListEntity categorys) {
 		this.mActivity = c;
 		if (categorys != null) {
+			if(categorys.getItems().size()>0)//新闻条数>0
+			{
 			this.items_list = categorys.getItems();
 			more_url = categorys.getMore_url();
+			}
 		}
 	}
 

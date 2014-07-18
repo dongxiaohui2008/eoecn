@@ -17,10 +17,16 @@
     <string name="menuBlog">社区博客</string>        
  
         <string name="menuNewsA">产业资讯</string>
-    <string name="menuNewsB">资本动态</string>
+        <string name="menuNewsMovie">电影产业</string>
+        <string name="menuNewsGame">游戏产业</string>
+        <string name="menuNewsComic">动漫产业</string>
+        <string name="menuNewsTv">电视产业</string>
+        <string name="menuNewsMusic">音乐产业</string>
+        <string name="menuNewsStar">明星经纪</string>        
+     <string name="menuNewsB">资本动态</string>
      <string name="menuNewsM">娱乐营销</string>
-      <string name="menuNewsC">政策法规</string>
-    <string name="menuInterview">人物访谈</string>
+     <string name="menuNewsC">政策法规</string>
+     <string name="menuInterview">人物访谈</string>
 
     <!-- 详情菜单 -->
     <string name="DetailsGood">太棒了</string>

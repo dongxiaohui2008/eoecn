@@ -70,6 +70,48 @@ public class Urls {
 	
 
 	/**
+	 * 产业资讯
+	 */
+	public static final String NewsA_LIST = "http://news.entgroup.cn/a/index.shtml";
+	public static final String NewsA_LIST_Base = "http://news.entgroup.cn";
+	
+	/**
+	 * 电影产业
+	 */
+	public static final String NewsMovie_LIST = "http://news.entgroup.cn/movie/index.shtml";
+	public static final String NewsMovie_LIST_Base = "http://news.entgroup.cn";
+	
+	/**
+	 * 游戏产业
+	 */
+	public static final String NewsGame_LIST = "http://news.entgroup.cn/game/index.shtml";
+	public static final String NewsGame_LIST_Base = "http://news.entgroup.cn";
+	
+	/**
+	 * 动漫产业
+	 */
+	public static final String NewsComic_LIST = "http://news.entgroup.cn/comic/index.shtml";
+	public static final String NewsComic_LIST_Base = "http://news.entgroup.cn";
+	
+	/**
+	 * 电视产业
+	 */
+	public static final String NewsTv_LIST = "http://news.entgroup.cn/tv/index.shtml";
+	public static final String NewsTv_LIST_Base = "http://news.entgroup.cn";
+	
+	/**
+	 * 音乐产业
+	 */
+	public static final String NewsMusic_LIST = "http://news.entgroup.cn/music/index.shtml";
+	public static final String NewsMusic_LIST_Base = "http://news.entgroup.cn";
+	
+	/**
+	 * 明星经纪
+	 */
+	public static final String NewsStar_LIST = "http://news.entgroup.cn/star/index.shtml";
+	public static final String NewsStar_LIST_Base = "http://news.entgroup.cn";
+	
+	/**
 	 * 资本动态
 	 */
 	public static final String NewsB_LIST = "http://news.entgroup.cn/b/index.shtml";
